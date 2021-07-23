@@ -1,22 +1,8 @@
 "use strict";
 
 const Hapi = require("@hapi/hapi");
-const Mysql = require("mysql");
+const locationService = require("./services/locationService");
 
-const dbConnection = Mysql.createConnection({
-  host: "134.209.246.16",
-  user: "testuser",
-  password: "123456789",
-  database: "testDatabase",
-});
-// Connects to DB
-dbConnection.connect((error) => {
-  if (error) {
-    console.log("DB connection not");
-    throw error;
-  }
-  console.log("connected to DB");
-});
 const init = async () => {
   const server = Hapi.server({
     port: 5100,
@@ -36,14 +22,7 @@ const init = async () => {
       method: "GET",
       path: "/api/patients",
       handler: (request, h) => {
-        dbConnection.query(
-          "SELECT * FROM patients",
-          (error, results, fields) => {
-            if (error) throw error;
-            console.log("Patients :", results);
-            return h.response(results);
-          }
-        );
+        return locationService.getPatients();
       },
     },
     // Gets all encounters form DB
@@ -51,14 +30,7 @@ const init = async () => {
       method: "GET",
       path: "/api/encounters",
       handler: (request, h) => {
-        dbConnection.query(
-          "SELECT * FROM encounters",
-          (error, results, fields) => {
-            if (error) throw error;
-            console.log("Encounters :", results);
-            return h.response(results);
-          }
-        );
+        return locationService.getEncounters();
       },
     },
     // Gets all locations form DB
@@ -67,15 +39,7 @@ const init = async () => {
       method: "GET",
       path: "/api/locations",
       handler: (request, h) => {
-        dbConnection.query(
-          "SELECT * FROM locations",
-          (error, results, fields) => {
-            if (error) throw error;
-            console.log("Locations :", results);
-            return results;
-          }
-        );
-        return h.results;
+        return locationService.getLocations();
       },
     },
     // Handles Incorrect input in the browser
