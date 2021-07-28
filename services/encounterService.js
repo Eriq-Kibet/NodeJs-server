@@ -1,19 +1,16 @@
-"use strict";
 const connection = require("../connection/connection");
-
-const locationDef = {
-  getLocations,
+// Query Encounters
+const encountersDef = {
+  getEncounters,
 };
-//Query Locations
-function getLocations() {
+function getEncounters() {
   return new Promise((resolve, reject) => {
     connection.dbConnection().then((pool) => {
-      pool.query("SELECT * FROM locations", function (error, results, fields) {
+      pool.query("SELECT * FROM encounters", function (error, results, fields) {
         if (error) throw error;
         resolve(results);
       });
     });
   });
 }
-
-module.exports = locationDef;
+module.exports = encountersDef;
