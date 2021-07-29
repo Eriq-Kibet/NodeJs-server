@@ -3,10 +3,11 @@
 const Hapi = require("@hapi/hapi");
 const locationService = require("./services/locationService");
 const encounterService = require("./services/encounterService");
-const patientService = require("./services/patientService");
+const searchPatientService = require("./services/searchPatientService");
 const hivStatusReport = require("./services/hivStatusMonthlyReportService");
-const patientSearchService = require("./services/patientSearchService");
-const encounterMonthService = require('./services/encounterMonthService');
+const patientDetailsService = require("./services/patientDetailsService");
+const encounterMonthService = require("./services/encounterMonthService");
+const hivMonthlyReportService = require("./services/hivMonthlyReportService");
 
 const init = async () => {
   const server = Hapi.server({
@@ -25,9 +26,11 @@ const init = async () => {
     {
       // Request all patients form DB
       method: "GET",
-      path: "/api/patients/",
+      path: "/api/patients",
       handler: (request, h) => {
-        return patientService.getPatients();
+        const patientName = request.query.name;
+        console.log("Patient name", patientName);
+        return searchPatientService.searchPatient(patientName)
       },
     },
     // Gets all encounters form DB
@@ -65,24 +68,34 @@ const init = async () => {
         return hivStatusReport.getHivStatusMonthlyReport(month);
       },
     },
-    // Search patient by name
+    // Get patient Details
     {
       method: "GET",
-      path: "/api/patients",
+      path: "/api/patients-details",
       handler: (request, h) => {
-        const patientName = request.query.name;
-        console.log("Patient name", patientName);
-        return patientSearchService.searchPatients(patientName);
+        const patientInfo = request.query.name;
+        console.log("Patient name", patientInfo);
+        return patientDetailsService.patientDetails(patientInfo);
       },
     },
-      // Get Encounter Months
-      {
-        method: "GET",
-        path: "/api/months",
-        handler: (request, h) => {
-          return encounterMonthService.getEncounterMonth()
-        },
+    // Get Encounter Months
+    {
+      method: "GET",
+      path: "/api/months",
+      handler: (request, h) => {
+        return encounterMonthService.getEncounterMonth();
       },
+    },
+    // Monthly Report
+    {
+      method: "GET",
+      path: "/api/monthly-report",
+      handler: (request, h) => {
+        const selectedMonth = request.query.encounter_datetime;
+        console.log("Selected Month", selectedMonth);
+        return hivMonthlyReportService.getHivMonthlyReport(selectedMonth);
+      },
+    },
   ]);
   //Starting the server
 
