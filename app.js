@@ -6,7 +6,6 @@ const encounterService = require("./services/encounterService");
 const searchPatientService = require("./services/searchPatientService");
 const hivStatusReport = require("./services/hivStatusMonthlyReportService");
 const patientDetailsService = require("./services/patientDetailsService");
-const encounterMonthService = require("./services/encounterMonthService");
 const hivMonthlyReportService = require("./services/hivMonthlyReportService");
 
 const init = async () => {
@@ -30,7 +29,7 @@ const init = async () => {
       handler: (request, h) => {
         const patientName = request.query.name;
         console.log("Patient name", patientName);
-        return searchPatientService.searchPatient(patientName)
+        return searchPatientService.searchPatient(patientName);
       },
     },
     // Gets all encounters form DB
@@ -63,9 +62,10 @@ const init = async () => {
       method: "GET",
       path: "/api/hiv-status-report",
       handler: (request, h) => {
-        const month = request.query.month;
-        console.log(month);
-        return hivStatusReport.getHivStatusMonthlyReport(month);
+        const status = request.query.hiv_status;
+        const year_month = request.query.encounter_datetime;
+        console.log(status, year_month);
+        return hivStatusReport.getHivStatusMonthlyReport(status, year_month);
       },
     },
     // Get patient Details
@@ -78,14 +78,7 @@ const init = async () => {
         return patientDetailsService.patientDetails(patientInfo);
       },
     },
-    // Get Encounter Months
-    {
-      method: "GET",
-      path: "/api/months",
-      handler: (request, h) => {
-        return encounterMonthService.getEncounterMonth();
-      },
-    },
+
     // Monthly Report
     {
       method: "GET",
